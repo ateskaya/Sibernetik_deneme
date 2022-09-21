@@ -8,64 +8,76 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SqlClient;
-using excel=Microsoft.Office.Interop.Excel;
+using excel = Microsoft.Office.Interop.Excel;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Data.OleDb;
 using System.DirectoryServices;
-
+using System.Data.SQLite;
 namespace Sibernetik_deneme
 {
     public partial class Form1 : Form
     {
-         SqlConnection baglanti;
-         SqlDataAdapter da;
-         SqlCommand komut;
-         OleDbConnection baglanti2;
-         OleDbConnection baglanti3;
-         OleDbDataAdapter oda;
-         OleDbDataAdapter oda2;
-         DataTable dt = new DataTable();
-         DataTable dt2 = new DataTable();
-         DataTable dt3 = new DataTable();
+        SQLiteConnection baglanti;
+        SQLiteDataAdapter da;
+        SQLiteCommand scmd;
+        SqlCommand komut;
+        OleDbConnection baglanti2;
+        OleDbConnection baglanti3;
+        SqlConnection baglanti4;
+        OleDbDataAdapter oda;
+        OleDbDataAdapter oda2;
+        SqlDataAdapter oda3;
+        OleDbCommand ocmd;
+        DataTable dt = new DataTable();
+        DataTable dt2 = new DataTable();
+        DataTable dt3 = new DataTable();
+        DataTable dt4 = new DataTable();
+        DataTable dt5 = new DataTable();
 
         public Form1()
         {
-        
+
             InitializeComponent();
         }
-
-        
-
-
-
-        void MusteriGetir()
-        {
-            baglanti = new SqlConnection(@"server=(localdb)\MSSQLLocalDB;Initial Catalog=Sibernetik;Integrated Security=SSPI");
-            baglanti.Open();
-            da = new SqlDataAdapter("Select *From vicual_deneme", baglanti);
-            DataTable tablo = new DataTable();
-            da.Fill(tablo);
-            dataGridView1.DataSource = tablo;
-            baglanti.Close();
-        }
+       
         void ServerBaglan()
         {
-            baglanti = new SqlConnection(@"server=(localdb)\MSSQLLocalDB;Initial Catalog=Sibernetik;Integrated Security=SSPI");
-            baglanti.Open();
-            // da = new SqlDataAdapter("Select *From vicual_deneme", baglanti);
-            // DataTable tablo = new DataTable();
-            // da.Fill(tablo);
-            // dataGridView1.DataSource = tablo;
-            baglanti.Close();
+            baglanti = new SQLiteConnection(@"Data Source=C:\Users\ensar\OneDrive\Masaüstü\sibernetik\dbbrowser\sibernetik.db;Version=3;");
+        }
+        void ServerBaglan1()
+        {
+            baglanti4 = new SqlConnection(@"server=(localdb)\MSSQLLocalDB;Initial Catalog=Sibernetik;Integrated Security=SSPI");
         }
         void excelbaglan1()
         {
             baglanti2 = new OleDbConnection(@"Provider = Microsoft.ACE.OLEDB.12.0; Data Source = " + openFileDialog1.FileName + ";Extended Properties = 'Excel 12.0 Xml;HDR=YES;'");
-            
+
         }
         void excelbaglan2()
         {
             baglanti3 = new OleDbConnection(@"Provider = Microsoft.ACE.OLEDB.12.0; Data Source = " + openFileDialog2.FileName + ";Extended Properties = 'Excel 12.0 Xml;HDR=YES;'");
+        }
+        void veriTabanýnaGönder4()
+        {
+            ServerBaglan1();
+            baglanti4.Open();
+            dt5 = new DataTable();
+            komut = new SqlCommand("select * from [Toplam Fatura] a where not exists \r\n(select * from [Yüklenilen KDV Listesi] b where a.Belge_No = b.[Belge No]);", baglanti4);
+            oda3 = new SqlDataAdapter(komut);
+            oda3.Fill(dt5);
+            dataGridView2.DataSource= dt5;
+            baglanti4.Close();
+        }
+        void veriTabanýnaGönder3()
+        {
+            ServerBaglan();
+            baglanti.Open();
+            dt4 = new DataTable();
+            scmd = new SQLiteCommand("select * from [Toplam Fatura] where not exists (select * from [Yüklenilen KDV Listesi] where [Toplam Fatura].BelgeNo = [Yüklenilen KDV Listesi].BelgeNo);", baglanti);
+            da = new SQLiteDataAdapter(scmd);
+            da.Fill(dt4);
+            dataGridView2.DataSource = dt4;
+            baglanti.Close();
         }
 
         void veriTabanýnaGönder2()
@@ -92,32 +104,33 @@ namespace Sibernetik_deneme
         }
         void veriTabanýnaGönder()
         {
-                dt3.Rows.Clear();
-                dt3.Columns.Clear();    
-                DataRow dr = dt3.NewRow();
-                baglanti2.Open();
-                baglanti3.Open();
-                dt3.Columns.Add("Belge No", typeof(string));
-                dt3.Columns.Add("Firma Kodu", typeof(string));
-                dt3.Columns.Add("Firma Adý", typeof(string));
-                var result = from Sayfa1 in dt2.AsEnumerable()
-                             join Sayfa2 in dt.AsEnumerable() on (string)Sayfa1["Belge No"] equals (string)Sayfa2["Alýþ Faturasýnýn Sýra No'su"]
-                             select new
-                             {
-                                 Belgo_No = (string)Sayfa1["Belge No"],
-                                 Firma_Kodu = (string)Sayfa1["Firma Kodu"],
-                                 Firma_Adý = (string)Sayfa1["Firma Adý"]
-                             };
-                foreach (var item in result)
-                {
-                    dr["Belge No"] = item.Belgo_No;
-                    dr["Firma Kodu"] = item.Firma_Kodu;
-                    dr["Firma Adý"] = item.Firma_Adý;
+            dt3.Rows.Clear();
+            dt3.Columns.Clear();
+            DataRow dr = dt3.NewRow();
+            baglanti2.Open();
+            baglanti3.Open();
+            ocmd = new OleDbCommand("");
+            dt3.Columns.Add("Belge No", typeof(string));
+            dt3.Columns.Add("Firma Kodu", typeof(string));
+            dt3.Columns.Add("Firma Adý", typeof(string));
+            var result = from Sayfa1 in dt2.AsEnumerable()
+                         join Sayfa2 in dt.AsEnumerable() on (string)Sayfa1["Belge No"] equals (string)Sayfa2["Alýþ Faturasýnýn Sýra No'su"]
+                         select new
+                         {
+                             Belgo_No = (string)Sayfa1["Belge No"],
+                             Firma_Kodu = (string)Sayfa1["Firma Kodu"],
+                             Firma_Adý = (string)Sayfa1["Firma Adý"]
+                         };
+            foreach (var item in result)
+            {
+                dr["Belge No"] = item.Belgo_No;
+                dr["Firma Kodu"] = item.Firma_Kodu;
+                dr["Firma Adý"] = item.Firma_Adý;
                 dt3.Rows.Add(dr.ItemArray);
-                }
-                dataGridView4.DataSource = dt3;
-                baglanti2.Close();
-                baglanti3.Close();
+            }
+            dataGridView4.DataSource = dt3;
+            baglanti2.Close();
+            baglanti3.Close();
         }
         void openFileDialogBaglan1()
         {
@@ -145,7 +158,7 @@ namespace Sibernetik_deneme
             excelbaglan1();
             excelbaglan2();
         }
-        
+
 
         private void button1_Click_1(object sender, EventArgs e)
         {
@@ -158,27 +171,12 @@ namespace Sibernetik_deneme
 
         private void button2_Click_1(object sender, EventArgs e)
         {
-            /*string sorgu = "Select * From vicual_deneme Where Miktar=@Miktar";
-            komut = new SqlCommand(sorgu, baglanti);
-            komut.Parameters.AddWithValue("@Miktar", Convert.ToInt32(tabloadý.Text));
-            baglanti.Open();
-            komut.ExecuteNonQuery();
-            baglanti.Close();
-            MusteriGetir();*/
+            
         }
 
         private void button3_Click_1(object sender, EventArgs e)
         {
-            /*string sorgu = "Update musteri Set Belge_No=@Belge_No,KDV_Oraný=@KDV_Oraný,Birim=@Birim Where Miktar=@Miktar";
-            komut = new SqlCommand(sorgu, baglanti);
-            komut.Parameters.AddWithValue("@Miktar", Convert.ToInt32(tabloadý.Text));
-            komut.Parameters.AddWithValue("@Belge_No", textBox2.Text);
-            komut.Parameters.AddWithValue("@KDV_Oraný", textBox3.Text);
-            komut.Parameters.AddWithValue("@Birim", textBox4.Text);
-            baglanti.Open();
-            komut.ExecuteNonQuery();
-            baglanti.Close();
-            MusteriGetir();*/
+            
         }
 
         private void dosyaismi_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -224,6 +222,7 @@ namespace Sibernetik_deneme
 
         private void button8_Click(object sender, EventArgs e)
         {
+            veriTabanýnaGönder3();
         }
 
         private void dataGridView4_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -236,5 +235,14 @@ namespace Sibernetik_deneme
 
         }
 
+        private void dosyaismi_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            veriTabanýnaGönder4();
+        }
     }
 }

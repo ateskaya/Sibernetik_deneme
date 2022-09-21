@@ -113,7 +113,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(520, 345);
+            this.button2.Location = new System.Drawing.Point(418, 354);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(83, 39);
             this.button2.TabIndex = 6;
@@ -154,6 +154,7 @@
             this.dosyaismi.Size = new System.Drawing.Size(148, 23);
             this.dosyaismi.TabIndex = 13;
             this.dosyaismi.WordWrap = false;
+            this.dosyaismi.TextChanged += new System.EventHandler(this.dosyaismi_TextChanged);
             this.dosyaismi.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.dosyaismi_MouseDoubleClick);
             // 
             // label5
@@ -209,20 +210,21 @@
             // 
             // button7
             // 
-            this.button7.Location = new System.Drawing.Point(418, 345);
+            this.button7.Location = new System.Drawing.Point(549, 300);
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(83, 39);
             this.button7.TabIndex = 17;
-            this.button7.Text = "sil";
+            this.button7.Text = "mssql gönder";
             this.button7.UseVisualStyleBackColor = true;
+            this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
             // button8
             // 
-            this.button8.Location = new System.Drawing.Point(418, 300);
+            this.button8.Location = new System.Drawing.Point(549, 230);
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(83, 39);
             this.button8.TabIndex = 16;
-            this.button8.Text = "k";
+            this.button8.Text = "Sqlite gönder";
             this.button8.UseVisualStyleBackColor = true;
             this.button8.Click += new System.EventHandler(this.button8_Click);
             // 
