@@ -20,10 +20,23 @@ namespace Sibernetik_deneme
         OleDbConnection baglanti3;
         OleDbDataAdapter oda;
         OleDbDataAdapter oda2;
+        SqlDataAdapter sda;
+        SqlDataAdapter sda2;
         DataTable dt = new DataTable();
         DataTable dt2 = new DataTable();
+        DataTable dt3 = new DataTable();
+        DataTable dt4 = new DataTable();
         OpenFileDialog od = new OpenFileDialog();
         OpenFileDialog od2 = new OpenFileDialog();
+        SqlConnection sqlConnection1;
+        SqlConnection sqlConnection2;
+        SqlConnection sqlConnection3;
+        SqlConnection sqlConnection4;
+        SqlCommand sqlCommand1;
+        SqlCommand sqlCommand2;
+        SqlCommand sqlCommand3;
+        SqlCommand sqlCommand4;
+
         BackgroundWorker bw = new BackgroundWorker
         {
             WorkerReportsProgress = true,
@@ -34,10 +47,8 @@ namespace Sibernetik_deneme
             WorkerReportsProgress = true,
             WorkerSupportsCancellation = true
         };
-
         public Form1()
         {
-
             InitializeComponent();
         }
         private void InsertExcelRecords()
@@ -56,35 +67,36 @@ namespace Sibernetik_deneme
                 Exceldt.AcceptChanges();
                 SqlConnection sqlConnection = new SqlConnection(@"server=(localdb)\MSSQLLocalDB;Initial Catalog=Sibernetik;Integrated Security=SSPI");
                 SqlBulkCopy objbulk = new SqlBulkCopy(sqlConnection);
-                objbulk.DestinationTableName = "[Toplam Fatura2]";
-                objbulk.ColumnMappings.Add("Tarih", "Tarih");
-                objbulk.ColumnMappings.Add("[Belge No]", "Belge_No");
-                objbulk.ColumnMappings.Add("[Firma Kodu]", "Firma_Kodu");
-                objbulk.ColumnMappings.Add("[Firma Adý]", "Firma_Adý");
-                objbulk.ColumnMappings.Add("[Stok Kodu]", "Stok_Kodu");
-                objbulk.ColumnMappings.Add("[Stok Adý]", "Stok_Adý");
-                objbulk.ColumnMappings.Add("[Satýr Açýklama]", "Satýr_Açýklama");
-                objbulk.ColumnMappings.Add("Barkod", "Barkod");
-                objbulk.ColumnMappings.Add("[KDV Oraný]", "KDV_Oraný");
-                objbulk.ColumnMappings.Add("[Miktar]", "Miktar");
-                objbulk.ColumnMappings.Add("[Birim]", "Birim");
-                objbulk.ColumnMappings.Add("[Birim Fiyatý (TL)]", "Birim_Fiyatý_TL");
-                objbulk.ColumnMappings.Add("[KDV Hariç Toplam (TL)]", "KDV_Hariç_Toplam_TL");
-                objbulk.ColumnMappings.Add("[KDV Tutarý (TL)]", "KDV_Tutarý_TL");
-                objbulk.ColumnMappings.Add("[KDV Dahil Toplam (TL)]", "KDV_Dahil_Toplam_TL");
-                objbulk.ColumnMappings.Add("[Hareket Kuru]", "Hareket_Kuru");
-                objbulk.ColumnMappings.Add("[Döviz Birim Fiyat]", "Döviz_Birim_Fiyat");
-                objbulk.ColumnMappings.Add("[Döviz Tutar]", "Döviz_Tutar");
-                //objbulk.ColumnMappings.Add("Vergi_Dairesi", "Vergi_Dairesi");
-                //objbulk.ColumnMappings.Add("Vergi_No_TC_Kimlik", "Vergi_No_TC_Kimlik");
+                objbulk.DestinationTableName = "[Toplam_Fatura]";
+                objbulk.ColumnMappings.Add("[Tarih]", "[Tarih]");
+                objbulk.ColumnMappings.Add("[Belge No]", "[Belge_No]");
+                objbulk.ColumnMappings.Add("[Firma Kodu]", "[Firma_Kodu]");
+                objbulk.ColumnMappings.Add("[Firma Adý]", "[Firma_Adý]");
+                objbulk.ColumnMappings.Add("[Vergi No / TC Kimlik No]", "[Vergi_No_TC_Kimlik_No]");
+                objbulk.ColumnMappings.Add("[Stok Kodu]", "[Stok_Kodu]");
+                objbulk.ColumnMappings.Add("[Stok Adý]", "[Stok_Adý]");
+                objbulk.ColumnMappings.Add("[Depo Kodu]", "[Depo_Kodu]");
+                objbulk.ColumnMappings.Add("[Satýr Açýklama]", "[Satýr_Açýklama]");
+                objbulk.ColumnMappings.Add("[Barkod]", "[Barkod]");
+                objbulk.ColumnMappings.Add("[KDV Oraný]", "[KDV_Oraný]");
+                objbulk.ColumnMappings.Add("[Miktar]", "[Miktar]");
+                objbulk.ColumnMappings.Add("[Birim]", "[Birim]");
+                objbulk.ColumnMappings.Add("[Birim Fiyatý (TL)]", "[Birim_Fiyatý_TL]");
+                objbulk.ColumnMappings.Add("[KDV Hariç Toplam (TL)]", "[KDV_Hariç_Toplam_TL]");
+                objbulk.ColumnMappings.Add("[KDV Tutarý (TL)]", "[KDV_Tutarý_TL]");
+                objbulk.ColumnMappings.Add("[KDV Dahil Toplam (TL)]", "[KDV_Dahil_Toplam_TL]");
+                objbulk.ColumnMappings.Add("[Genel Toplam (TL)]", "[Genel_Toplam_TL]");
+                objbulk.ColumnMappings.Add("[Hareket Kuru]", "[Hareket_Kuru]");
+                objbulk.ColumnMappings.Add("[Döviz Birim Fiyat]", "[Döviz_Birim_Fiyat]");
+                objbulk.ColumnMappings.Add("[Döviz Tutar]", "[Döviz_Tutar]");
                 sqlConnection.Open();
                 objbulk.WriteToServer(Exceldt);
                 sqlConnection.Close();
-                MessageBox.Show("Data has been Imported successfully.", "Imported", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Veri tabanýna eklendi.", "Bilgi Kutusu", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                MessageBox.Show(string.Format("Data has not been Imported due to :{0}", ex.Message), "Not Imported", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(string.Format("Uygulamayý kapatýp tekrar baþlatýn ve doðru tabloyu seçtiðinizden emin olun!!!"), "Imported", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
         private void InsertExcelRecords2()
@@ -125,12 +137,12 @@ namespace Sibernetik_deneme
                 objbulk.ColumnMappings.Add("[Aracýn Þasi Numarasý]", "[Aracýn Þasi Numarasý]");
                 sqlConnection.Open();
                 objbulk.WriteToServer(Exceldt);
-                sqlConnection.Close();
-                MessageBox.Show("Data has been Imported successfully.", "Imported", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                sqlConnection.Close();   
+                MessageBox.Show("Veri tabanýna eklendi.", "Bilgi Kutusu", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                MessageBox.Show(string.Format("Data has not been Imported due to :{0}", ex.Message), "Not Imported", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(string.Format("Uygulamayý kapatýp tekrar baþlatýn ve doðru tabloyu seçtiðinizden emin olun!!!"), "Imported", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
         void excelbaglan1()
@@ -150,13 +162,12 @@ namespace Sibernetik_deneme
             oda2.Fill(dt);
             dataGridView1.DataSource = dt;
             baglanti2.Close();
-
         }
         void veriTabanýnaGönder1()
         {
             excelbaglan2();
             baglanti3.Open();
-            dt = new DataTable();
+            dt2 = new DataTable();
             oda = new OleDbDataAdapter("Select * from [Sayfa1$]", baglanti3);
             oda.Fill(dt2);
             dataGridView3.DataSource = dt2;
@@ -169,18 +180,18 @@ namespace Sibernetik_deneme
         {
             excelbaglan1();
             excelbaglan2();
+            button4.Visible = false;
+            button5.Visible = false; 
         }
         private void button4_Click(object sender, EventArgs e)
         {
             od2.Filter = "Excell|*.xls;*.xlsx;";
-
             DialogResult dr2 = od2.ShowDialog();
             if (dr2 == DialogResult.Abort)
                 return;
             if (dr2 == DialogResult.Cancel)
                 return;
             tabloadý.Text = od2.FileName.ToString();
-            String text = tabloadý.Text;
             veriTabanýnaGönder2();
             if (bw2.IsBusy)
             {
@@ -198,13 +209,14 @@ namespace Sibernetik_deneme
             bw2.RunWorkerCompleted += (bwSender, bwArg) =>
             {
                 sWatch.Stop();
-                tabloadý.Text = "";
+                tabloadý.Text = od2.SafeFileName;
                 button4.Enabled = true;
                 bw2.Dispose();
             };
             button4.Enabled = false;
             button4.Visible = false;
             bw2.RunWorkerAsync();
+            button2.Visible= true;
         }
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
@@ -212,18 +224,15 @@ namespace Sibernetik_deneme
         private void tabloadý2_MouseDoubleClick(object sender, MouseEventArgs e)
         {
         }
-        
         private void button5_Click(object sender, EventArgs e)
         {
             od.Filter = "Excell|*.xls;*.xlsx;";
-
             DialogResult dr = od.ShowDialog();
             if (dr == DialogResult.Abort)
                 return;
             if (dr == DialogResult.Cancel)
                 return;
             tabloadý2.Text = od.FileName.ToString();
-            String text = tabloadý2.Text;
             veriTabanýnaGönder1();
             if (bw.IsBusy)
             {
@@ -241,13 +250,14 @@ namespace Sibernetik_deneme
             bw.RunWorkerCompleted += (bwSender, bwArg) =>
             {
                 sWatch.Stop();
-                tabloadý2.Text = "";
+                tabloadý2.Text = od.SafeFileName;
                 button5.Enabled = true;
                 bw.Dispose();
             };
             button5.Enabled = false;
             button5.Visible = false; 
             bw.RunWorkerAsync();
+            button1.Visible = true;
         }
         private void dataGridView3_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -260,6 +270,80 @@ namespace Sibernetik_deneme
         }
         private void label1_Click(object sender, EventArgs e)
         {
+        }
+        private void button1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                sqlConnection1 = new SqlConnection(@"server=(localdb)\MSSQLLocalDB;Initial Catalog=Sibernetik;Integrated Security=SSPI");
+                sqlConnection1.Open();
+                sqlCommand1 = new SqlCommand("delete from [Toplam_Fatura]", sqlConnection1);
+                sqlCommand1.ExecuteNonQuery();
+                MessageBox.Show("Veri tabanýndan silindi.");
+                button5.Visible = true;
+                sqlConnection1.Close();
+                button1.Visible=false;
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Kayýt etme iþlemini tamamladýysanýz ve silerken hata aldýysanýz. Uygulamayý tekrar baþlatýp sil butonunu çalýþtýrýn. Daha sonra tekrar uygulamayý baþlatýp iþlemlerinizi yapabilirsiniz");
+            }
+            dt2.Rows.Clear();
+        }
+        private void button2_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                sqlConnection2 = new SqlConnection(@"server=(localdb)\MSSQLLocalDB;Initial Catalog=Sibernetik;Integrated Security=SSPI");
+                sqlConnection2.Open();
+                sqlCommand2 = new SqlCommand("delete from [Yüklenilen KDV Listesi2]", sqlConnection2);
+                sqlCommand2.ExecuteNonQuery();
+                MessageBox.Show("Veri tabanýndan silindi.");
+                button4.Visible = true;
+                sqlConnection2.Close();
+                button2.Visible = false;
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Kayýt etme iþlemini tamamladýysanýz ve silerken hata aldýysanýz. Uygulamayý tekrar baþlatýp sil butonunu çalýþtýrýn. Daha sonra tekrar uygulamayý baþlatýp iþlemlerinizi yapabilirsiniz");
+            }
+            dt.Rows.Clear();
+        }
+        private void button3_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                sqlConnection3 = new SqlConnection(@"server=(localdb)\MSSQLLocalDB;Initial Catalog=Sibernetik;Integrated Security=SSPI");
+                sqlConnection3.Open();
+                sqlCommand3 = new SqlCommand("select * from [Toplam_Fatura] a where not exists (select * from [Yüklenilen KDV Listesi] b where a.Belge_No=b.[Belge No]);", sqlConnection3);
+                sda = new SqlDataAdapter(sqlCommand3);
+                sda.Fill(dt3);
+                dataGridView4.DataSource = dt3;
+                MessageBox.Show("Kod çalýþtý");
+                sqlConnection3.Close();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Uygulamayý kapatýn ve tekrar deneyin!!!");
+            }
+        }
+        private void button6_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                sqlConnection4 = new SqlConnection(@"server=(localdb)\MSSQLLocalDB;Initial Catalog=Sibernetik;Integrated Security=SSPI");
+                sqlConnection4.Open();
+                sqlCommand4 = new SqlCommand("select * from [Toplam_Fatura] a inner join [Yüklenilen KDV Listesi2] b on a.Belge_No=b.[Belge No];", sqlConnection4);
+                sda2 = new SqlDataAdapter(sqlCommand4);
+                sda2.Fill(dt4);
+                dataGridView2.DataSource = dt4;
+                MessageBox.Show("Kod çalýþtý");
+                sqlConnection4.Close();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Uygulamayý kapatýn ve tekrar deneyin!!!!Denemeasdads");
+            }
         }
     }
 }
