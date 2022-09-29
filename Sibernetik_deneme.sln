@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sibernetik_deneme", "Sibernetik_deneme\Sibernetik_deneme.csproj", "{8A4D8F92-3443-4C0E-95E1-F86619D12413}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sibernetik_deneme", "Sibernetik_deneme\Sibernetik_deneme.csproj", "{8A4D8F92-3443-4C0E-95E1-F86619D12413}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Sibernetik", "Sibernetik\Sibernetik.vdproj", "{BADB6915-BDE2-4057-B910-420A0E731C0E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,8 @@ Global
 		{8A4D8F92-3443-4C0E-95E1-F86619D12413}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A4D8F92-3443-4C0E-95E1-F86619D12413}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A4D8F92-3443-4C0E-95E1-F86619D12413}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BADB6915-BDE2-4057-B910-420A0E731C0E}.Debug|Any CPU.ActiveCfg = Debug
+		{BADB6915-BDE2-4057-B910-420A0E731C0E}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

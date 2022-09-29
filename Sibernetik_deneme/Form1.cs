@@ -12,6 +12,8 @@ using excel = Microsoft.Office.Interop.Excel;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Data.OleDb;
 using System.DirectoryServices;
+using ClosedXML.Excel;
+
 namespace Sibernetik_deneme
 {
     public partial class Form1 : Form
@@ -94,9 +96,10 @@ namespace Sibernetik_deneme
                 sqlConnection.Close();
                 MessageBox.Show("Veri tabanýna eklendi.", "Bilgi Kutusu", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(string.Format("Uygulamayý kapatýp tekrar baþlatýn ve doðru tabloyu seçtiðinizden emin olun!!!"), "Imported", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(string.Format("Dosyanýn sayfa isminin 'Sayfa1' olduðundan ve seçtiðiniz dosyanýn içeriðinde Toplam Faturalarýn olduðundan emin olun!!!  "), "Imported", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("hata nedeni:" + ex);
             }
         }
         private void InsertExcelRecords2()
@@ -137,12 +140,13 @@ namespace Sibernetik_deneme
                 objbulk.ColumnMappings.Add("[Aracýn Þasi Numarasý]", "[Aracýn Þasi Numarasý]");
                 sqlConnection.Open();
                 objbulk.WriteToServer(Exceldt);
-                sqlConnection.Close();   
+                sqlConnection.Close();
                 MessageBox.Show("Veri tabanýna eklendi.", "Bilgi Kutusu", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(string.Format("Uygulamayý kapatýp tekrar baþlatýn ve doðru tabloyu seçtiðinizden emin olun!!!"), "Imported", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(string.Format("Dosyanýn sayfa isminin 'Sayfa1' olduðundan ve seçtiðiniz dosyanýn içeriðinde Yüklenilen KDV Listesi olduðundan emin olun!!! "), "Imported", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("hata nedeni:" + ex);
             }
         }
         void excelbaglan1()
@@ -284,9 +288,10 @@ namespace Sibernetik_deneme
                 sqlConnection1.Close();
                 button1.Visible=false;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Kayýt etme iþlemini tamamladýysanýz ve silerken hata aldýysanýz. Uygulamayý tekrar baþlatýp sil butonunu çalýþtýrýn. Daha sonra tekrar uygulamayý baþlatýp iþlemlerinizi yapabilirsiniz");
+                MessageBox.Show("Uygulamayý kapatýn ve tekrar baþlatýn daha sonra iþlemlerinizi yapabilirsiniz");
+                MessageBox.Show("hata nedeni:"+ex);            
             }
             dt2.Rows.Clear();
         }
@@ -303,9 +308,10 @@ namespace Sibernetik_deneme
                 sqlConnection2.Close();
                 button2.Visible = false;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Kayýt etme iþlemini tamamladýysanýz ve silerken hata aldýysanýz. Uygulamayý tekrar baþlatýp sil butonunu çalýþtýrýn. Daha sonra tekrar uygulamayý baþlatýp iþlemlerinizi yapabilirsiniz");
+                MessageBox.Show("Uygulamayý kapatýn ve tekrar baþlatýn daha sonra iþlemlerinizi yapabilirsiniz");
+                MessageBox.Show("hata nedeni:" + ex);
             }
             dt.Rows.Clear();
         }
@@ -315,16 +321,39 @@ namespace Sibernetik_deneme
             {
                 sqlConnection3 = new SqlConnection(@"server=(localdb)\MSSQLLocalDB;Initial Catalog=Sibernetik;Integrated Security=SSPI");
                 sqlConnection3.Open();
-                sqlCommand3 = new SqlCommand("select * from [Toplam_Fatura] a where not exists (select * from [Yüklenilen KDV Listesi] b where a.Belge_No=b.[Belge No]);", sqlConnection3);
+                
+                sqlCommand3 = new SqlCommand("select * from Toplam_Fatura a where not exists" +
+                    "(select * from[Yüklenilen KDV Listesi2] b where a.Belge_No = b.[Belge No]" +
+                    " and a.Tarih = b.[Alýþ Faturasýnýn Tarihi] and a.Vergi_No_TC_Kimlik_No = b.[Satýcýnýn Vergi Kimlik Numarasý / TC Kimlik Numarasý]); ", sqlConnection3);
                 sda = new SqlDataAdapter(sqlCommand3);
                 sda.Fill(dt3);
                 dataGridView4.DataSource = dt3;
                 MessageBox.Show("Kod çalýþtý");
                 sqlConnection3.Close();
+                using (SaveFileDialog sfd = new SaveFileDialog() { Filter = "Excel_Dosyasý|*.xlsx" })
+                {
+                    if (sfd.ShowDialog() == DialogResult.OK)
+                    {
+                        try
+                        {
+                            using (XLWorkbook workbook = new XLWorkbook())
+                            {
+                                workbook.Worksheets.Add(dt3, "deneme");
+                                workbook.SaveAs(sfd.FileName);
+                            }
+                            MessageBox.Show("Excel dosyasý oluþturuldu.");
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "Excel Dosyasý Oluþturulamadý", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 MessageBox.Show("Uygulamayý kapatýn ve tekrar deneyin!!!");
+                MessageBox.Show("hata nedeni:" + ex);
             }
         }
         private void button6_Click(object sender, EventArgs e)
@@ -333,16 +362,36 @@ namespace Sibernetik_deneme
             {
                 sqlConnection4 = new SqlConnection(@"server=(localdb)\MSSQLLocalDB;Initial Catalog=Sibernetik;Integrated Security=SSPI");
                 sqlConnection4.Open();
-                sqlCommand4 = new SqlCommand("select * from [Toplam_Fatura] a inner join [Yüklenilen KDV Listesi2] b on a.Belge_No=b.[Belge No];", sqlConnection4);
+                sqlCommand4 = new SqlCommand("select * from [Toplam_Fatura] a inner join [Yüklenilen KDV Listesi2] b on a.[Belge_No]=b.[Belge No];", sqlConnection4);
                 sda2 = new SqlDataAdapter(sqlCommand4);
                 sda2.Fill(dt4);
                 dataGridView2.DataSource = dt4;
                 MessageBox.Show("Kod çalýþtý");
                 sqlConnection4.Close();
+                using (SaveFileDialog sfd = new SaveFileDialog() { Filter = "Excel_Dosyasý|*.xlsx" })
+                {
+                    if (sfd.ShowDialog() == DialogResult.OK)
+                    {
+                        try
+                        {
+                            using (XLWorkbook workbook = new XLWorkbook())
+                            {
+                                workbook.Worksheets.Add(dt4, "deneme");
+                                workbook.SaveAs(sfd.FileName);
+                            }
+                            MessageBox.Show("Excel dosyasý oluþturuldu.");
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "Excel Dosyasý Oluþturulamadý", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Uygulamayý kapatýn ve tekrar deneyin!!!!Denemeasdads");
+                MessageBox.Show("Uygulamayý kapatýn ve tekrar deneyin!!!!");
+                MessageBox.Show("hata nedeni:" + ex);
             }
         }
     }
